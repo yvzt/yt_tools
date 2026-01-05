@@ -161,11 +161,6 @@ Arrow lengths vary **linearly** from `L1` at start to `L2` at end.
 **Defaults**
 - `*yt_load_head_len*` = `7.0`
 - `*yt_load_head_w*`   = `2.0`
-
-**Important implementation note**
-- Do not use `t` as a variable name in AutoLISP (it conflicts with `T`).
-  This tool uses `s` as the interpolation fraction.
-
 ---
 
 ## Style / Consistency Strategy (Recommended)
