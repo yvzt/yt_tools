@@ -186,14 +186,3 @@ A practical workflow:
 ## License / Usage
 
 Use freely in your own drawings and teaching materials.  
-If you publish or share modifications, consider keeping the command names consistent (YT prefix) for compatibility.
-
----
-
-## Roadmap (Optional)
-
-- `YTSTYLE` / `YTCONS`: one-shot consistency tool to retune arrowheads and shafts in a selected set.
-- Optional “envelope line” for `YTDLOAD` (connect load arrow tails to depict triangular/trapezoidal load surfaces).
-- Tick style variants (ISO 45°, perpendicular caps, etc.) for `YTDIM`.
-
----
