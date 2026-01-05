@@ -1,6 +1,6 @@
 # YT AutoLISP Drafting Tools
 
-A small, fast set of AutoLISP commands for producing clean, repeatable **engineering annotations** (arrows, normal arrows, dimension-like graphics without text, and distributed loads) using **plain AutoCAD geometry** (LINE + LWPOLYLINE), not DIM objects.
+A small, fast set of AutoLISP commands for producing clean, repeatable **engineering educational figure annotations** (arrows, normal arrows, dimension-like graphics without text, and distributed loads) using **plain AutoCAD geometry** (LINE + LWPOLYLINE), not DIM objects.
 
 This library is intentionally **non-dynamic**: style is fixed per drawing, and drawings remain simple to edit manually.
 
