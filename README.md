@@ -5,7 +5,14 @@ A small, fast set of AutoLISP commands for producing clean, repeatable **enginee
 This library is intentionally **non-dynamic**: style is fixed per drawing, and drawings remain simple to edit manually.
 
 ---
+---
 
+## Acknowledgement
+
+This project was developed with the assistance of AI-based tooling used interactively throughout the design and implementation process.  
+The concepts, drafting conventions, and final decisions reflect the author’s own engineering judgement and professional practice.
+
+---
 ## Contents
 
 - `yt_tools.lsp` (main tool file)
