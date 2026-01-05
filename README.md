@@ -8,8 +8,7 @@ This library is intentionally **non-dynamic**: style is fixed per drawing, and d
 
 ## Acknowledgement
 
-This project was developed with the assistance of AI-based tooling used interactively throughout the design and implementation process.  
-The concepts, drafting conventions, and final decisions reflect the author’s own engineering judgement and professional practice.
+This repository was developed using AI-assisted tools as part of an interactive workflow.
 
 ---
 ## Contents
