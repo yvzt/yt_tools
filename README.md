@@ -5,7 +5,6 @@ A small, fast set of AutoLISP commands for producing clean, repeatable **enginee
 This library is intentionally **non-dynamic**: style is fixed per drawing, and drawings remain simple to edit manually.
 
 ---
----
 
 ## Acknowledgement
 
