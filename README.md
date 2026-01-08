@@ -1,8 +1,8 @@
-# YT AutoLISP Drafting Tools (v2.0)
+# YT AutoLISP Drafting Tools (v1.0)
 
 A set of AutoLISP commands for producing clean, repeatable **engineering educational figure annotations** (arrows, normal arrows, dimension-like graphics without text, and distributed loads) using **plain AutoCAD geometry** (LINE + LWPOLYLINE).
 
-Version 2.0 introduces **Global Scaling**, **Smart Layering**, and a centralized **Configuration** command.
+Version 1.0 introduces **Global Scaling**, **Smart Layering**, and a centralized **Configuration** command.
 
 ---
 
