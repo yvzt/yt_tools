@@ -1,8 +1,8 @@
-# YT AutoLISP Drafting Tools
+# YT AutoLISP Drafting Tools (v2.0)
 
-A small, fast set of AutoLISP commands for producing clean, repeatable **engineering educational figure annotations** (arrows, normal arrows, dimension-like graphics without text, and distributed loads) using **plain AutoCAD geometry** (LINE + LWPOLYLINE), not DIM objects.
+A set of AutoLISP commands for producing clean, repeatable **engineering educational figure annotations** (arrows, normal arrows, dimension-like graphics without text, and distributed loads) using **plain AutoCAD geometry** (LINE + LWPOLYLINE).
 
-This library is intentionally **non-dynamic**: style is fixed per drawing, and drawings remain simple to edit manually.
+Version 2.0 introduces **Global Scaling**, **Smart Layering**, and a centralized **Configuration** command.
 
 ---
 
@@ -11,39 +11,51 @@ This library is intentionally **non-dynamic**: style is fixed per drawing, and d
 This repository was developed using AI-assisted tools as part of an interactive workflow.
 
 ---
+
 ## Contents
 
-- `yt_tools.lsp` (main tool file)
-- Commands:
-  - `YTARROW`  — straight arrow between two points
-  - `YTARROWN` — arrow normal to a selected curve at a chosen side
-  - `YTDIMA`   — aligned-dimension-like (no text), **arrows always inside**
-  - `YTDIM`    — aligned-dimension-like (no text), **ticks at ends (30°)**
-  - `YTDLOAD`  — linearly varying distributed load
+- `yt_tools.lsp` (Main library)
+- **Global Config Command:** `YTCONFIG`
+- **Drawing Commands:**
+  - `YTARROW`  — Straight arrow (single or double)
+  - `YTARROWN` — Arrow normal to curve (Tension/Compression modes)
+  - `YTDIMA`   — Dimension style graphic (Arrows, no text)
+  - `YTDIM`    — Dimension style graphic (Ticks, no text)
+  - `YTDLOAD`  — Linearly varying distributed load
 
 ---
 
 ## Installation
 
-1. Place `yt_tools.lsp` somewhere on your machine.
+1. Save `yt_tools.lsp` to a support folder.
 2. In AutoCAD:
    - Run `APPLOAD`
-   - Load `yt_tools.lsp`
-3. (Optional) Add to Startup Suite so it loads automatically.
+   - Select `yt_tools.lsp` and Load.
+3. (Optional) Add to the **Startup Suite** content to load automatically.
 
 ---
 
-## General Conventions
+## Global Configuration (`YTCONFIG`)
 
-- Geometry is created using:
-  - **LINE** for shafts/extension markers/ticks
-  - **LWPOLYLINE** for wedge arrowheads
-- Tools use persistent global defaults stored in variables like:
-  - `*yt_arrow_len*`, `*yt_arrow_w*`, etc.
-- Most commands follow the pattern:
-  1) **Options** (set defaults)  
-  2) **Pick geometry**  
-  3) **Draw**
+Type `YTCONFIG` to manage global settings. This replaces the need to set individual variables manually.
+
+### Settings Available:
+1.  **Scale:** A global multiplier for all arrows, ticks, and text sizes.
+    * *Example:* Set Scale to `100` for site plans, `1.0` for details.
+2.  **Layers:** Toggle **Smart Layering** (Auto/Current) and set default colors.
+3.  **Params:** Configure base (unscaled) sizes for arrows, ticks, and extensions.
+4.  **Reset:** Restore factory defaults.
+
+---
+
+## Smart Layering
+
+The tools operate in two modes (toggle via `YTCONFIG`):
+
+| Mode | Behavior |
+| :--- | :--- |
+| **Auto (Default)** | Automatically creates and uses semantic layers:<br>• `YT_ANNOTATION` (Color 7) for arrows<br>• `YT_DIM` (Color 8) for dimensions<br>• `YT_LOAD` (Color 1) for loads |
+| **Current** | Draws geometry on the currently active layer. Best for quick sketches. |
 
 ---
 
@@ -51,130 +63,89 @@ This repository was developed using AI-assisted tools as part of an interactive 
 
 ### 1) `YTARROW` — Straight Arrow
 
-Draws a straight arrow between two points:
-- By default: head at the **second** point
-- Optional: **both-end** arrow
+Draws a straight arrow between two points.
 
-**Prompts**
-1. Options: `Length`, `Width`
-2. Pick first point
-3. Pick second point (head)
-4. Both-end? `[Yes/No]`
+**Prompts:**
+1. Options: `Length`, `Width` (Change arrowhead size on the fly)
+2. Pick tail point
+3. Pick head point
+4. Double-ended? `[Yes/No]`
 
-**Defaults**
-- `*yt_arrow_len*` = `7.0` (arrowhead length)
-- `*yt_arrow_w*`   = `2.0` (half-width parameter; wedge base width ≈ `2*w`)
-
-**Notes**
-- If the segment is too short, the tool automatically reduces head length to avoid overlap.
+**Notes:**
+- Checks distance; if points are too close, the arrowhead automatically shrinks to fit.
 
 ---
 
-### 2) `YTARROWN` — Arrow Normal to Curve
+### 2) `YTARROWN` — Normal Arrow (Curve)
 
-Draws an arrow **normal** to a selected object at the closest point to your side-pick.
+Draws an arrow perpendicular to a selected curve (Line, Arc, Spline, Polyline). Supports both **Tension** (Away) and **Pressure** (To) styles.
 
-**Supported objects**
-- LINE, ARC, CIRCLE
-- LWPOLYLINE / POLYLINE
-- SPLINE
-- (any AutoCAD curve supported by `vlax-curve-*`)
+**Prompts:**
+1. **Options Menu:**
+   - `Reach`: Length of the arrow shaft (Type value or Pick two points).
+   - `To`: Sets direction **To Curve** (Pressure/Compression).
+   - `Away`: Sets direction **Away from Curve** (Tension/Normal).
+   - `Length` / `Width`: Adjust arrowhead size.
+2. Select curve.
+3. Pick side point (determines placement).
+4. Double-ended? `[Yes/No]`
 
-**Prompts**
-1. Options: `HeadLen`, `Width`, `Reach`
-2. Select curve
-3. Pick point near curve (defines which side)
-4. Both-end? `[Yes/No]`
-
-**Defaults**
-- `*yt_n_head_len*` = `7.0`
-- `*yt_n_head_w*`   = `2.0`
-- `*yt_n_reach*`    = `50.0` (distance from curve point to arrow tip)
-
-**Notes**
-- The side pick determines the normal direction (left/right of tangent).
-- For both-end, a symmetric arrow is drawn on both sides of the curve point.
+**Defaults:**
+- Default direction: **Away** (Tension).
+- Reach defaults to `50.0` (multiplied by Global Scale).
 
 ---
 
-### 3) `YTDIMA` — Aligned Dimension Geometry (No Text, Arrows Inside)
+### 3) `YTDIMA` — Dimension Graphic (Arrows)
 
-Produces a dimension-like graphic without text:
-- **shaft line** between two tips
-- simple **extension markers** at ends (short, centered)
-- **arrowheads always inside** (triangle body extends inward)
+Draws a dimension line with arrowheads inside, extension lines, and ticks. **No text is created.**
 
-**Workflow**
-1. Pick point 1
-2. Pick point 2
-3. Pick “dimension line location” (defines offset side and distance)
+**Prompts:**
+1. Options: `Length`, `Width` (Adjust arrowhead size)
+2. Pick Extension Point 1
+3. Pick Extension Point 2
+4. Pick Dimension Line Location (Offset)
 
-**Defaults**
-- `*yt_dima_head_len*` = `7.0`
-- `*yt_dima_head_w*`   = `2.0`
-
-**Notes**
-- This is intentionally simplified: extension markers are short and meant for quick manual adjustment.
-- In “minor cases”, you can mirror the result manually if you want outside arrows.
+**Notes:**
+- Arrowheads are always drawn **inside** the extension lines.
+- Includes small vertical ticks at the corners.
 
 ---
 
-### 4) `YTDIM` — Aligned Dimension Geometry (No Text, No Arrows, 30° Ticks)
+### 4) `YTDIM` — Dimension Graphic (Ticks)
 
-Like `YTDIMA` but:
-- **no arrowheads**
-- adds **ticks** at both ends
-- each tick:
-  - is centered at the shaft endpoint
-  - makes **30°** with the extension marker direction
-  - tick length = **half** the extension marker length
+Architectural style dimension line with **30° ticks** instead of arrows.
 
-**Defaults**
-- `*yt_dim_ext_len*` = `7.0` (extension marker length)
-- `*yt_dim_tick_ang*` = `30.0` (tick angle; currently fixed by design)
+**Prompts:**
+1. Options:
+   - `ExtLen`: Length of the vertical extension markers.
+   - `TickLen`: Length of the slanted tick marks.
+2. Pick Extension Point 1
+3. Pick Extension Point 2
+4. Pick Dimension Line Location (Offset)
 
-**Notes**
-- This is meant as a “clean drafting symbol” alternative to arrowheads.
+**Notes:**
+- Ticks are automatically oriented (slanted) based on the dimension direction.
 
 ---
 
-### 5) `YTDLOAD` — Linearly Varying Distributed Load
+### 5) `YTDLOAD` — Distributed Load
 
-Draws a distributed load along a baseline (two points), with arrows on a selected side.
-Arrow lengths vary **linearly** from `L1` at start to `L2` at end.
+Draws a distributed load along a baseline. Arrows are interpolated linearly.
 
-**Workflow**
-1. Pick baseline start point
-2. Pick baseline end point
-3. Pick side (near the baseline)
+**Workflow:**
+1. Pick baseline Start point.
+2. Pick baseline End point.
+3. Pick Load Direction (side).
 4. Enter:
-   - `L1` arrow length at start (can be **0**)
-   - `L2` arrow length at end (can be **0**)
-   - `n` number of divisions
+   - Arrow length at Start (`L1`)
+   - Arrow length at End (`L2`)
+   - Number of divisions (`n`)
 
-**Arrow count logic**
-- Normally arrows are placed at division points `i = 0..n` → **n+1 arrows**
-- If `L1 = 0` → no arrow at the start point
-- If `L2 = 0` → no arrow at the end point
-- (intermediate arrows are still drawn as per linear interpolation)
-
-**Defaults**
-- `*yt_load_head_len*` = `7.0`
-- `*yt_load_head_w*`   = `2.0`
----
-
-## Style / Consistency Strategy (Recommended)
-
-These tools are designed so that you can decide a **fixed style per drawing**.
-
-A practical workflow:
-- Choose arrowhead length/width at the beginning for the figure scale.
-- Keep the same parameters for the entire figure.
-- If you need global retuning later, implement a “consistency” command that:
-  - selects objects by layer or selection set
-  - updates widths/lengths accordingly
-
-(Keeping geometry simple is the priority.)
+**Features:**
+- If `L1` or `L2` is **0**, the arrow at that end is omitted.
+- Arrows are automatically placed on the `YT_LOAD` layer (Red) if Smart Layering is ON.
+- Arrowhead sizes scale with `YTCONFIG` Global Scale.---
 
 ---
 
